@@ -2,10 +2,10 @@
 //Boilerplating stuff; dw about it
 const { Client, ChannelType, Events, GatewayIntentBits, EmbedBuilder,  ActivityType, TextChannel, ThreadAutoArchiveDuration, MessageCollector } = require('discord.js');
 const token = process.env['TOKEN']
+const axios = require('axios');
 const fs = require('fs');
 const path = require('path');
 const prefix = '!';
-console.log(GatewayIntentBits)
 const client = new Client({
 	intents: [
 		GatewayIntentBits.Guilds,
@@ -54,22 +54,25 @@ client.on('ready', (c) => { //right but urs wont be displayed we can make it rot
 
 });
 
+function snakeToPascalCase(name) {
+  const words = name.toLowerCase().split('_');
+  const capitalizedWords = words.map(word => word.charAt(0).toUpperCase() + word.slice(1));
+  return capitalizedWords.join(' ');
+}
+
 client.on(Events.MessageCreate, async msg => {
   if (msg.author.bot) return;
   
   const args = msg.content.slice(prefix.length).split(/ +/);
   const command = args.shift().toLowerCase();
 
-  if(command === "ping"){
-    msg.reply("pong")
+  if(command === "ching"){
+    msg.reply("chong")
   }
   if(msg.content === "good bot"){
     msg.reply(":heart: :)")
   }
 
-  if(msg.content === "thanks ethan"){
-    msg.reply("this is pretty epic")
-  }
   
   if(command === "carry"){
     try{
@@ -156,6 +159,82 @@ client.on(Events.MessageCreate, async msg => {
               .setFooter({text: "Created by ethqnol#261 & suupre#0001"})
     msg.channel.send({embeds: [helpembed]})
   }
+
+
+  if(command === "bzmargin"){
+    msg.delete()
+    let topFew = args[2] || 5
+    let afford = args[0] || 10000000
+    let quant = args[1] || 1
+    if(topFew > 10){
+      topFew = 5
+    }
+    
+    const url = 'https://bazaar.cc2.workers.dev/?summary=true';  
+    async function fetchData() {
+      try {
+        const response = await axios.get(url);
+        const content = response.data;
+        const rows = content.split('\n');
+        const data = rows.map(row => row.split(','));
+        const topMargins = calculateMargins(data);
+        console.log(topMargins);
+        fs.writeFileSync('output.csv', topMargins.map(item => `${item.name},${item.buyPrice},${item.sellPrice},${item.margin}`).join('\n'));
+            
+        const bz = new EmbedBuilder()
+                  .setTitle(`Bazaar Margins:`)
+        for (let i = 0; i < topMargins.length; i++) {
+                bz.addFields({name: ` ${i+1}) ${snakeToPascalCase(topMargins[i].name)}`, value: `Margin: ${topMargins[i].margin}\n Buy: ${topMargins[i].buyPrice}\n Sell: ${topMargins[i].sellPrice}`});
+        }
+        
+        bz.setTimestamp()
+        bz.setFooter({text: "Created by ethqnol#261 & suupre#0001"})
+        msg.channel.send({embeds: [bz]})
+        
+      } catch (error) {
+        console.error('Failed to fetch data:', error);
+      }
+    }
+    
+    function calculateMargins(data) {
+      const items = [];
+      for (let i = 1; i < data.length; i++) {
+        const item = {
+          name: data[i][0],
+          buyPrice: Number(data[i][5]),
+          sellPrice: Number(data[i][1]),
+          sellVolume: Number(data[i][2]),
+          sellMovingWeek: Number(data[i][3]),
+          backlog: Number(data[i][2])/(Number(data[i][3])/7) // sellVolume / (sellMovingWeek / 7.0)
+        };
+        if (!isNaN(item.buyPrice) && !isNaN(item.sellPrice) && item.sellPrice < (afford / quant) && item.buyPrice - item.sellPrice < item.buyPrice * 0.3 && item.backlog < 3){
+          item.margin = item.buyPrice - item.sellPrice;
+          items.push(item);
+        }
+      }
+      items.sort((a, b) => b.margin - a.margin);
+      if(items.length < topFew){
+        topFew = items.length
+      }
+      const topMargins = items.slice(0, topFew).map(item => ({
+        name: item.name,
+        buyPrice: item.buyPrice.toLocaleString(),
+        sellPrice: item.sellPrice.toLocaleString(),
+        margin: item.margin.toLocaleString()
+      }));
+      return topMargins;
+    }
+    fetchData()
+
+
+
+    
+  }
+
+
+
+
+  
 
 });
 
