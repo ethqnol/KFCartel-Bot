@@ -1,12 +1,13 @@
 
 //Boilerplating stuff; dw about it
 const Sentiment = require('sentiment');
-const { Client, ChannelType, Events, GatewayIntentBits, EmbedBuilder,  ActivityType, TextChannel, ThreadAutoArchiveDuration, MessageCollector } = require('discord.js');
+
+const { Client, ChannelType, Events, GatewayIntentBits, EmbedBuilder,  ActivityType, TextChannel, ThreadAutoArchiveDuration, MessageCollector, SlashCommandBuilder, Collection } = require('discord.js');
 const csv = require('csv-parser')
 const token = process.env['TOKEN']
 const axios = require('axios');
-const fs = require('fs');
-const path = require('path');
+const fs = require('node:fs');
+const path = require('node:path');
 const prefix = '!';
 const client = new Client({
 	intents: [
@@ -22,7 +23,9 @@ const express = require('express');
 const app = express()
 const port = 3000;
 app.get('/', (req, res) => res.send('Hello World!'));
-app.listen(port, () => console.log(`http://localhost:${port}`))
+app.listen(port, () => {
+  console.log(`http://localhost:${port}`)
+})
 //status
 let status = [{
     name: ' totallyamqzing\'s YT Channel',
@@ -55,6 +58,10 @@ client.on('ready', (c) => { //right but urs wont be displayed we can make it rot
   }, updateDelay * 1000);
 
 });
+
+function extractIDFromPing(input){
+  return input.replace(/[<@>]/g, '')
+}
 
 function snakeToPascalCase(name) {
   const words = name.toLowerCase().split('_');
@@ -662,16 +669,137 @@ client.on(Events.MessageCreate, async msg => {
       msg.reply("Could not find slayer")
     }
   }
-  
 
+  if(command === "startmatch"){
+    try{
+      if(msg.channel.id != "1102594019483197561"){
+        msg.delete()
+        return;
+      }
+      msg.delete();
+      let channel = client.channels.cache.get("1102594019483197561")
+      let p1 = extractIDFromPing(args[0])
+      let p2 = extractIDFromPing(args[1])
+      let p1User = await client.users.fetch(p1)
+      p1User = p1User.username
+      let p2User = await client.users.fetch(p2)
+      p2User=p2User.username
+      let ready1 = false
+      let ready2 = false
+      let bothready = false
+      if(p1 && p2){
+        let tourneyF = false
+        const match = await channel.threads
+          .create({
+             name: `${p1User}-vs-${p2User}`,
+             autoArchiveDuration: ThreadAutoArchiveDuration.OneHour,
+             type: ChannelType.PublicThread,
+           })
+          .catch(console.error);
+        const matchEm = new EmbedBuilder()
+              .setTitle(`Rules: `)
+              .setDescription("Type !cancel to finish")
+              .addFields({ name: '1. ', value: "Please no cheating" })
+              .addFields({ name: '2. ', value: "Matches hosted by suupre" })
+              .addFields({ name: '3. ', value: "Best out of 3"})
+              .addFields({ name: '4. ', value: "Toxity = Disqualification" })
+              .addFields({ name: '5. ', value: "Games will be paused/restarted for Hypixel caused disconnects" })
+              .addFields({ name: '6. ', value: "Use common sense" })
+              .setTimestamp()
+              .setFooter({text: "Created by ethqnol#261 & suupre#0001"})
+        match.send({embeds : [matchEm]})
+        match.send(`<@${p1}> <@${p2}>`);
+        while(tourneyF != true){
+          const collected = await match.awaitMessages({ max:1, time: 0 });
+          let collectedContent = collected.first().content
+          if(collected.first().content === "!cancel"){
+            match.delete();
+            tourneyF = true;
+            break
+          }
+          if(collected.first().content === "!complete"){
+            match.delete();
+            tourneyF = true;
+            break
+          }
+          if(collected.first().content == "!ready" && bothready == false){
+            if(collected.first().author == p1){
+              console.log("p1 is ready")
+              ready1=true
+              match.send(`${p1User} (player 1) is ready`)
+            }
+            
+            if(collected.first().author == p2){
+              console.log("p2 is ready")
+              ready2=true
+              match.send(`${p2User} (player 2) is ready`)
+            }
+            if(ready1 == true && ready2 == true && bothready == false){
+              console.log("Both players are ready")
+              bothready = true
+              match.send(`<@${p1}> <@${p2}> <@${"433014488728600577"}> All users ready. Are ready. Match is being initiated`)
+            }
+          }       
+        }
+      }
+    }catch (error){
+      console.log(error)
+      msg.channel.send("An error occured")
+    }
+  }
 
+  if(command = "giveaway"){
+    const upvote = '👍' 
+    let name = args[0]
+  }
+
+    
 
 //TODO; PROVIDE A LIST OF ITEMS for recipe
 
 //TODO; BAZAAR ITEM FINDER/PRICE RETURNER
 
+
   
 });
 
+client.commands = new Collection();
+
+
+const commandsPath = path.join(__dirname, 'commands');
+const commandFiles = fs.readdirSync(commandsPath).filter(file => file.endsWith('.js'));
+
+for (const file of commandFiles) {
+	const filePath = path.join(commandsPath, file);
+	const command = require(filePath);
+	// Set a new item in the Collection with the key as the command name and the value as the exported module
+	if ('data' in command && 'execute' in command) {
+		client.commands.set(command.data.name, command);
+	} else {
+		console.log(`[WARNING] The command at ${filePath} is missing a required "data" or "execute" property.`);
+	}
+}
+
+client.on(Events.InteractionCreate, async interaction => {
+	if (!interaction.isChatInputCommand()) return;
+
+	const command = interaction.client.commands.get(interaction.commandName);
+
+	if (!command) {
+		console.error(`No command matching ${interaction.commandName} was found.`);
+		return;
+	}
+
+	try {
+		await command.execute(interaction);
+	} catch (error) {
+		console.error(error);
+		if (interaction.replied || interaction.deferred) {
+			await interaction.followUp({ content: 'There was an error while executing this command!', ephemeral: true });
+		} else {
+			await interaction.reply({ content: 'There was an error while executing this command!', ephemeral: true });
+		}
+	}
+});
 
 client.login(token)
