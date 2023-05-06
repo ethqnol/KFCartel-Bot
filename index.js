@@ -1,6 +1,6 @@
 
 //Boilerplating stuff; dw about it
-
+const Sentiment = require('sentiment');
 const { Client, ChannelType, Events, GatewayIntentBits, EmbedBuilder,  ActivityType, TextChannel, ThreadAutoArchiveDuration, MessageCollector } = require('discord.js');
 const csv = require('csv-parser')
 const token = process.env['TOKEN']
@@ -22,7 +22,7 @@ const express = require('express');
 const app = express()
 const port = 3000;
 app.get('/', (req, res) => res.send('Hello World!'));
-app.listen(port, () => console.log(`Keep Alicce listening at http://localhost:${port}`))
+app.listen(port, () => console.log(`listening at http://localhost:${port}`))
 //status
 let status = [{
     name: ' totallyamqzing\'s YT Channel',
@@ -63,7 +63,6 @@ function snakeToPascalCase(name) {
 }
 
 client.on(Events.MessageCreate, async msg => {
-
   
   if(msg.content === "good bot"){
     msg.reply(":heart: :)")
@@ -271,7 +270,7 @@ client.on(Events.MessageCreate, async msg => {
           sellMovingWeek: Number(data[i][3]),
           backlog: Number(data[i][2])/(Number(data[i][3])/7) // sellVolume / (sellMovingWeek / 7.0)
         };
-        if (!isNaN(item.buyPrice) && !isNaN(item.sellPrice) && item.sellPrice < (afford / quant) && item.buyPrice - item.sellPrice < item.buyPrice * 0.5 && item.backlog < 3){
+        if (!isNaN(item.buyPrice) && !isNaN(item.sellPrice) && item.sellPrice < (afford / quant) && item.backlog < 1){
           item.margin = item.buyPrice - item.sellPrice;
           items.push(item);
         }
