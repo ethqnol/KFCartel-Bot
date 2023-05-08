@@ -748,11 +748,6 @@ client.on(Events.MessageCreate, async msg => {
     }
   }
 
-  if(command = "giveaway"){
-    const upvote = '👍' 
-    let name = args[0]
-  }
-
     
 
 //TODO; PROVIDE A LIST OF ITEMS for recipe
