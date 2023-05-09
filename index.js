@@ -130,7 +130,7 @@ client.on(Events.MessageCreate, async msg => {
               .addFields({ name: '2. ', value: "Higher levels are paid; Price can be negotiated" })
               .addFields({ name: '3. ', value: "Blaze Slayer & VoidGloom t4 are not sold" })
               .setTimestamp()
-              .setFooter({text: "Created by ethqnol#261 & suupre#0001"})
+              .setFooter({text: "Created by ethqnol#1000 & suupre#0001"})
         slayerThread.send({embeds : [embedSlayer]})
         slayerThread.send(`<@&${slayer}> <@&${all}>`);
         while(flagSl != true){
@@ -159,7 +159,7 @@ client.on(Events.MessageCreate, async msg => {
               .addFields({ name: '2. ', value: "Catacombs Level or repeated completions are paid." })
               .addFields({ name: '3. ', value: "Not Carrying Mastermode; teaching secrets is free." })
               .setTimestamp()
-              .setFooter({text: "Created by ethqnol#261 & suupre#0001"})
+              .setFooter({text: "Created by ethqnol#1000 & suupre#0001"})
         doogansThread.send({embeds : [embedDoogans]})
         doogansThread.send(`<@&${doogans}> <@&${all}>`);
         while(flagDo != true){
@@ -187,7 +187,7 @@ client.on(Events.MessageCreate, async msg => {
               .addFields({ name: '1. ', value: "Negotiate Pricing" })
               .addFields({ name: '2. ', value: "No Carrying Blaze Slayer, MM, or Voidgloom t4" })
               .setTimestamp()
-              .setFooter({text: "Created by ethqnol#261 & suupre#0001"})
+              .setFooter({text: "Created by ethqnol#1000 & suupre#0001"})
         otherThread.send({embeds : [otherEmbed]})
         otherThread.send("<@&" + all + ">");
         while(flagOther != true){
@@ -218,7 +218,7 @@ client.on(Events.MessageCreate, async msg => {
               .addFields({ name: '4. !ping', value: "used to determine if bot is down" })
               .addFields({ name: '5. !bzmargin', value: "!bzmargin [amount to spend] [quantity] [length of list]" })
               .setTimestamp()
-              .setFooter({text: "Created by ethqnol#2613 & suupre#0001"})
+              .setFooter({text: "Created by ethqnol#1000 & suupre#0001"})
     msg.channel.send({embeds: [helpembed]})
   }
 
@@ -258,7 +258,7 @@ client.on(Events.MessageCreate, async msg => {
         }
         
         bz.setTimestamp()
-        bz.setFooter({text: "Created by ethqnol#2613 & suupre#0001"})
+        bz.setFooter({text: "Created by ethqnol#1000 & suupre#0001"})
         msg.channel.send({embeds: [bz]})
         
       } catch (error) {
@@ -394,7 +394,7 @@ client.on(Events.MessageCreate, async msg => {
                         { name: 'Slot 8', value: `${snakeToPascalCase(recipe.C2.element)} x${recipe.C2.amount}`, inline: true },
                         { name: 'Slot 9', value: `${snakeToPascalCase(recipe.C3.element)} x${recipe.C3.amount}`, inline: true})
               .setTimestamp()
-              .setFooter({text: "Created by ethqnol#261 & suupre#0001"})
+              .setFooter({text: "Created by ethqnol#1000 & suupre#0001"})
     msg.channel.send({embeds: [recipeEm]})
     }
 
@@ -591,7 +591,7 @@ client.on(Events.MessageCreate, async msg => {
                                                   .setDescription("Uses recursion to calculate the rough price of a minion")
                                                   .addFields({ name: `${minion} cost:`, value: `_**${Math.floor(cost)} coins**_` })
                                                   .setTimestamp()
-                                                  .setFooter({text: "Created by ethqnol#2613 & suupre#0001"})]}))
+                                                  .setFooter({text: "Created by ethqnol#1000 & suupre#0001"})]}))
     }catch (error) {
       console.log(error)
       msg.reply("There was an error getting the minion. Please double check you minion name")
@@ -706,7 +706,7 @@ client.on(Events.MessageCreate, async msg => {
               .addFields({ name: '5. ', value: "Games will be paused/restarted for Hypixel caused disconnects" })
               .addFields({ name: '6. ', value: "Use common sense" })
               .setTimestamp()
-              .setFooter({text: "Created by ethqnol#261 & suupre#0001"})
+              .setFooter({text: "Created by ethqnol#1000 & suupre#0001"})
         match.send({embeds : [matchEm]})
         match.send(`<@${p1}> <@${p2}>`);
         while(tourneyF != true){

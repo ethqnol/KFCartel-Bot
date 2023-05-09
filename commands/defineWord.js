@@ -28,15 +28,19 @@ module.exports = {
             let partOfSpeech = part.partOfSpeech
             let partDefs = part.definitions
             let theDefs = partDefs.reduce((past, def) =>{ 
-              let newItem = past + `ㅤ**_Definition:_** ${def.definition}\n\n`
+              let newItem = past + ` **_Definition:_** ${def.definition} \n\n`
               if(newItem.length > 1000){
                 return past
               }else{
                 return newItem
               }
             },  " ")
-              
-            return {name: `${i + 1}) __${partOfSpeech}__`, value: `${theDefs}`}
+
+            if(wordInput.trim().toLowerCase() == "grandpa"){
+              theDefs = ` **_Definition:_**: code name for the guy also referred to as Suupre (Suus). The individual "Suupre", is allgedly ancient, hence the the term which is used to refer to him. He has allegedly used the phrase \"back in my day\".`
+            }
+            
+            return {name: `${i + 1}) __${partOfSpeech}__`, value: `>>> ${theDefs}`}
           }))
           .setTimestamp()
           .setFooter({text: "Created by ethqnol#2613 & suupre#0001"})
